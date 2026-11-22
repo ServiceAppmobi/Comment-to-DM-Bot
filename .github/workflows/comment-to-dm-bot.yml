@@ -1,0 +1,102 @@
+name: 📩 ServiceApp Comment-to-DM Bot (IG & FB)
+
+on:
+  schedule:
+    # Automatyczne skanowanie nowych komentarzy co 10 minut (24/7 w chmurze GitHub)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    # Ręczne uruchomienie jednym kliknięciem z aplikacji GitHub na iPhone lub Apple Skrótów
+    inputs:
+      mode:
+        description: 'Tryb uruchomienia bota'
+        required: true
+        default: 'live'
+        type: choice
+        options:
+          - live
+          - dry-run
+          - mock
+          - test-meta
+          - test-email
+          - test-push
+
+concurrency:
+  # Zapobiega nakładaniu się cykli i podwójnej wysyłce DM
+  group: serviceapp-comment-to-dm
+  cancel-in-progress: false
+
+jobs:
+  comment-to-dm:
+    name: Skanowanie komentarzy IG & FB + wysyłka Private Reply DM
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Pobierz kod bota i reguły (rules.json)
+        uses: actions/checkout@v4
+
+      - name: 🐍 Skonfiguruj Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 💾 Przywróć bazę comment_dm.db (deduplikacja między cyklami)
+        uses: actions/cache/restore@v4
+        with:
+          path: comment_dm.db
+          key: comment-dm-db-${{ github.run_id }}
+          restore-keys: |
+            comment-dm-db-
+
+      - name: 🚀 Uruchom bota Comment-to-DM
+        env:
+          APP_NAME: ${{ secrets.APP_NAME }}
+          APP_URL: ${{ secrets.APP_URL }}
+          ANDROID_STORE_URL: ${{ secrets.ANDROID_STORE_URL }}
+          IOS_STORE_URL: ${{ secrets.IOS_STORE_URL }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_USERNAME: ${{ secrets.IG_USERNAME }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          INSTAGRAM_ENABLED: ${{ vars.INSTAGRAM_ENABLED || 'true' }}
+          FACEBOOK_ENABLED: ${{ vars.FACEBOOK_ENABLED || 'true' }}
+          MAX_POSTS_PER_PLATFORM: ${{ vars.MAX_POSTS_PER_PLATFORM || '10' }}
+          MAX_DMS_PER_RUN: ${{ vars.MAX_DMS_PER_RUN || '25' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          echo "📩 Bot ServiceApp Comment-to-DM uruchomiony w GitHub Actions"
+          echo "⏰ $(date '+%Y-%m-%d %H:%M:%S UTC')"
+          MODE="${{ inputs.mode || 'live' }}"
+          echo "⚙️ Tryb: $MODE"
+          if [ "$MODE" = "mock" ]; then
+            python3 main.py --mock
+          elif [ "$MODE" = "dry-run" ]; then
+            python3 main.py --dry-run
+          elif [ "$MODE" = "test-meta" ]; then
+            python3 main.py --test-meta
+          elif [ "$MODE" = "test-email" ]; then
+            python3 main.py --test-email
+          elif [ "$MODE" = "test-push" ]; then
+            python3 main.py --test-push
+          else
+            python3 main.py
+          fi
+          echo "✅ Zakończono cykl bota"
+
+      - name: 💾 Zapisz zaktualizowaną bazę comment_dm.db w cache
+        if: always() && hashFiles('comment_dm.db') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: comment_dm.db
+          key: comment-dm-db-${{ github.run_id }}
+
+      - name: 📊 Pokaż statystyki bazy DM
+        if: always()
+        run: python3 main.py --stats

@@ -1,0 +1,21 @@
+# Środowisko i sekrety
+.env
+.env.local
+
+# Baza danych i logi
+*.db
+*.db-journal
+*.sqlite
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+
+# Systemowe
+.DS_Store
+Thumbs.db
