@@ -68,7 +68,7 @@ test('processComment triggers ServiceApp download reply, DM, tracked store links
   const res1 = processComment(
     {
       username: '@marek',
-      comment: 'Hej, poproszę APP ServiceApp!',
+      comment: 'Hej, poproszę POBIERZ ServiceApp!',
       channel: 'instagram',
       timestamp: t0,
       variantSeed: 0,
@@ -145,6 +145,29 @@ test('processComment triggers ServiceApp download reply, DM, tracked store links
   );
   assert.equal(res3.matched, true);
   assert.equal(res3.skippedReason, null);
+});
+
+test('all North & South America languages match their dedicated ServiceApp rules without collision', () => {
+  const cases = [
+    ['Want to download the app!', 'serviceapp-download-en-americas'],
+    ['Quiero descargar la app en México!', 'serviceapp-download-es-americas'],
+    ['Busco laburo en Argentina', 'serviceapp-download-es-americas'],
+    ['Busco pega en Chile', 'serviceapp-download-es-americas'],
+    ['Busco camello en Colombia', 'serviceapp-download-es-americas'],
+    ['Quero baixar o aplicativo no Brasil!', 'serviceapp-download-pt-br'],
+    ["Je veux télécharger l'application au Québec!", 'serviceapp-download-fr-americas'],
+    ['Ik wil de app downloaden in Suriname!', 'serviceapp-download-nl-americas'],
+    ['Mwen vle telechaje aplikasyon an!', 'serviceapp-download-ht-haiti'],
+    ['Aipota mboguejy tembiapo Paraguay-pe!', 'serviceapp-download-gn-paraguay'],
+    ['APP', 'serviceapp-universal-global'],
+  ];
+
+  for (const [comment, expectedRuleId] of cases) {
+    const res = processComment({ username: '@user', comment, channel: 'instagram' }, defaultConfig, {});
+    assert.equal(res.matched, true, `Expected match for: ${comment}`);
+    assert.equal(res.rule.id, expectedRuleId, `Wrong rule for "${comment}": got ${res.rule.id}`);
+    assert.ok(res.whatsappUrl.startsWith('https://wa.me/34627193784?text='));
+  }
 });
 
 test('buildTrackedStoreUrl adds Google Play referrer, App Store ct and Web UTM params', () => {

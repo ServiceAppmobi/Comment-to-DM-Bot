@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ServiceApp — Pobierz aplikację i napisz na WhatsApp</title>
+  <title>ServiceApp — Download App &amp; WhatsApp</title>
   <style>
     :root {
       --bg: #0b1120;
@@ -14,7 +14,6 @@
       --muted: #94a3b8;
       --accent: #25d366;
       --accent-hover: #1ebe5b;
-      --blue: #38bdf8;
     }
     * { box-sizing: border-box; }
     body {
@@ -29,18 +28,41 @@
     }
     .card {
       width: 100%;
-      max-width: 460px;
+      max-width: 470px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 22px;
-      padding: 28px 24px;
+      padding: 24px 22px 28px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
       text-align: center;
+    }
+    .lang-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .lang-btn {
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .lang-btn:hover { color: var(--text); border-color: var(--accent); }
+    .lang-btn.active {
+      background: rgba(37, 211, 102, 0.16);
+      border-color: var(--accent);
+      color: #4ade80;
     }
     .avatar {
       width: 68px;
       height: 68px;
-      margin: 0 auto 14px;
+      margin: 0 auto 12px;
       border-radius: 20px;
       background: linear-gradient(135deg, #25d366, #0ea5e9);
       color: #052e16;
@@ -51,7 +73,7 @@
       box-shadow: 0 10px 24px rgba(37, 211, 102, 0.3);
     }
     h1 { margin: 0; font-size: 23px; }
-    .tagline { margin: 8px 0 16px; font-size: 13.5px; color: var(--muted); }
+    .tagline { margin: 8px 0 14px; font-size: 13.5px; color: var(--muted); }
     .status-pill {
       display: inline-flex;
       align-items: center;
@@ -62,7 +84,7 @@
       color: #4ade80;
       font-size: 12px;
       font-weight: 600;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #25d366; }
     .section-label {
@@ -74,11 +96,7 @@
       color: var(--muted);
       margin: 14px 0 8px;
     }
-    .store-grid {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
+    .store-grid { display: grid; gap: 10px; margin-bottom: 16px; }
     .store-btn {
       display: flex;
       align-items: center;
@@ -102,31 +120,10 @@
     }
     .store-btn:hover { transform: translateY(-1px); border-color: var(--accent); }
     .store-btn small { font-size: 11.5px; opacity: 0.85; display: block; font-weight: 500; }
-    .actions { display: grid; gap: 9px; margin-bottom: 18px; text-align: left; }
-    .action-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 15px;
-      border-radius: 12px;
-      background: var(--input);
-      border: 1px solid var(--border);
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 13.5px;
-      transition: all 0.15s ease;
-    }
-    .action-btn:hover {
-      border-color: var(--accent);
-      background: rgba(37, 211, 102, 0.1);
-    }
-    .action-btn span.arrow { color: var(--accent); font-weight: 700; white-space: nowrap; }
     .custom-box {
       text-align: left;
       border-top: 1px solid var(--border);
-      padding-top: 16px;
+      padding-top: 14px;
       margin-top: 8px;
     }
     label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
@@ -141,7 +138,7 @@
       font-family: inherit;
       margin-bottom: 10px;
     }
-    textarea { min-height: 68px; resize: vertical; }
+    textarea { min-height: 66px; resize: vertical; }
     .submit-btn {
       width: 100%;
       border: none;
@@ -155,7 +152,7 @@
     }
     .submit-btn:hover { background: var(--accent-hover); }
     .qr-wrap {
-      margin-top: 20px;
+      margin-top: 18px;
       padding-top: 16px;
       border-top: 1px solid var(--border);
       display: flex;
@@ -163,15 +160,10 @@
       align-items: center;
       gap: 8px;
     }
-    .qr-inner {
-      background: #fff;
-      padding: 10px;
-      border-radius: 12px;
-      display: inline-block;
-    }
+    .qr-inner { background: #fff; padding: 10px; border-radius: 12px; display: inline-block; }
     .footer-link {
       display: inline-block;
-      margin-top: 16px;
+      margin-top: 14px;
       font-size: 12px;
       color: var(--muted);
       text-decoration: none;
@@ -181,201 +173,367 @@
 </head>
 <body>
   <main class="card">
+    <div class="lang-bar" id="lang-bar"></div>
     <div class="avatar" id="brand-avatar">SA</div>
     <h1 id="brand-name">ServiceApp</h1>
-    <p class="tagline" id="brand-tagline">Pobierz darmową aplikację ServiceApp na Androida lub iPhone'a!</p>
-    <div class="status-pill" id="source-pill"><span class="status-dot"></span>Darmowa aplikacja · Rejestracja w 1 minutę</div>
+    <p class="tagline" id="brand-tagline"></p>
+    <div class="status-pill" id="source-pill"></div>
 
-    <div class="section-label">1. Pobierz aplikację ServiceApp</div>
+    <div class="section-label" id="lbl-step1"></div>
     <div class="store-grid" id="store-buttons"></div>
 
-    <div class="section-label">2. Lub napisz od razu na WhatsApp</div>
-    <div class="actions" id="quick-actions"></div>
-
-    <form class="custom-box" id="custom-wa-form">
-      <label for="visitor-name">Twoje imię (opcjonalnie)</label>
-      <input type="text" id="visitor-name" placeholder="np. Anna" />
-      <label for="visitor-msg">Pytanie o ServiceApp / rejestrację</label>
-      <textarea id="visitor-msg" placeholder="Cześć! Chcę pobrać ServiceApp i mam pytanie..."></textarea>
-      <button type="submit" class="submit-btn">📲 Otwórz czat WhatsApp</button>
+    <div class="section-label" id="lbl-step2"></div>
+    <form class="custom-box" id="custom-wa-form" style="border-top:none;padding-top:0;margin-top:0;">
+      <label for="visitor-name" id="lbl-name"></label>
+      <input type="text" id="visitor-name" />
+      <label for="visitor-msg" id="lbl-msg"></label>
+      <textarea id="visitor-msg"></textarea>
+      <button type="submit" class="submit-btn" id="btn-wa-submit"></button>
     </form>
 
     <div class="qr-wrap">
       <div class="qr-inner" id="landing-qr"></div>
-      <span style="font-size:11.5px;color:var(--muted);">Na komputerze? Zeskanuj telefonem, aby przejść na WhatsApp.</span>
+      <span id="lbl-qr-hint" style="font-size:11.5px;color:var(--muted);"></span>
     </div>
 
-    <a class="footer-link" href="./index.html">← Panel Social Bot Studio</a>
+    <a class="footer-link" href="./index.html" id="lbl-studio">← ServiceApp Social Bot Studio</a>
   </main>
 
   <script type="module">
     import { buildTrackedStoreUrl, buildWhatsAppUrl } from './src/engine.js';
     import { generateQrSvg } from './src/qr.js';
 
+    const I18N = {
+      pl: {
+        label: '🇵🇱 PL',
+        tagline: "Pobierz darmową aplikację ServiceApp na Androida lub iPhone'a!",
+        pill: 'Darmowa aplikacja · Rejestracja w 1 minutę',
+        step1: '1. Pobierz aplikację ServiceApp',
+        step2: '2. Lub napisz od razu na WhatsApp',
+        androidTitle: '🤖 Pobierz na Androida',
+        androidSub: 'Oficjalna aplikacja w Google Play',
+        iosTitle: '🍎 Pobierz na iPhone (iOS)',
+        iosSub: 'Oficjalna aplikacja w App Store',
+        webTitle: '🌐 Otwórz stronę ServiceApp',
+        cta: 'Pobierz →',
+        nameLabel: 'Twoje imię (opcjonalnie)',
+        namePh: 'np. Anna',
+        msgLabel: 'Pytanie o ServiceApp / rejestrację',
+        msgPh: 'Cześć! Chcę pobrać ServiceApp...',
+        waBtn: '📲 Otwórz czat WhatsApp',
+        waDefault: 'Cześć! Piszę z {{source}}. Chcę pobrać aplikację ServiceApp!',
+        waGreet: 'Cześć, tu',
+        qrHint: 'Na komputerze? Zeskanuj telefonem, aby otworzyć WhatsApp.',
+      },
+      en: {
+        label: '🇺🇸 EN',
+        tagline: 'Download the free ServiceApp on Android or iPhone and register in 1 minute!',
+        pill: 'Free App · US, Canada & Americas',
+        step1: '1. Download ServiceApp',
+        step2: '2. Or chat with us on WhatsApp',
+        androidTitle: '🤖 Download for Android',
+        androidSub: 'Official app on Google Play',
+        iosTitle: '🍎 Download for iPhone (iOS)',
+        iosSub: 'Official app on the App Store',
+        webTitle: '🌐 Open ServiceApp Website',
+        cta: 'Get App →',
+        nameLabel: 'Your name (optional)',
+        namePh: 'e.g. Alex',
+        msgLabel: 'Message / question about ServiceApp',
+        msgPh: 'Hi! I want to download ServiceApp...',
+        waBtn: '📲 Open WhatsApp Chat',
+        waDefault: 'Hi! Reaching out from {{source}}. I want to download ServiceApp!',
+        waGreet: "Hi, I'm",
+        qrHint: 'On desktop? Scan with your phone camera to open WhatsApp.',
+      },
+      es: {
+        label: '🌎 ES',
+        tagline: '¡Descarga ServiceApp gratis para Android o iPhone y regístrate en 1 minuto!',
+        pill: 'App Gratis · Toda América Latina',
+        step1: '1. Descarga ServiceApp',
+        step2: '2. O escríbenos por WhatsApp',
+        androidTitle: '🤖 Descargar para Android',
+        androidSub: 'App oficial en Google Play',
+        iosTitle: '🍎 Descargar para iPhone (iOS)',
+        iosSub: 'App oficial en App Store',
+        webTitle: '🌐 Abrir sitio web ServiceApp',
+        cta: 'Descargar →',
+        nameLabel: 'Tu nombre (opcional)',
+        namePh: 'ej. Carlos',
+        msgLabel: 'Mensaje sobre ServiceApp',
+        msgPh: '¡Hola! Quiero descargar ServiceApp...',
+        waBtn: '📲 Abrir chat en WhatsApp',
+        waDefault: '¡Hola! Escribo desde {{source}}. Quiero descargar ServiceApp.',
+        waGreet: '¡Hola! Soy',
+        qrHint: '¿En computadora? Escanea con tu celular para abrir WhatsApp.',
+      },
+      pt: {
+        label: '🇧🇷 PT',
+        tagline: 'Baixe o ServiceApp grátis para Android ou iPhone e cadastre-se em 1 minuto!',
+        pill: 'App Grátis · Brasil',
+        step1: '1. Baixe o aplicativo ServiceApp',
+        step2: '2. Ou fale conosco no WhatsApp',
+        androidTitle: '🤖 Baixar para Android',
+        androidSub: 'App oficial na Google Play',
+        iosTitle: '🍎 Baixar para iPhone (iOS)',
+        iosSub: 'App oficial na App Store',
+        webTitle: '🌐 Abrir site ServiceApp',
+        cta: 'Baixar →',
+        nameLabel: 'Seu nome (opcional)',
+        namePh: 'ex. Lucas',
+        msgLabel: 'Mensagem sobre o ServiceApp',
+        msgPh: 'Olá! Quero baixar o ServiceApp...',
+        waBtn: '📲 Abrir conversa no WhatsApp',
+        waDefault: 'Olá! Vim do {{source}}. Quero baixar o ServiceApp!',
+        waGreet: 'Olá, sou',
+        qrHint: 'No computador? Escaneie com a câmera do celular para abrir o WhatsApp.',
+      },
+      fr: {
+        label: '🇨🇦 FR',
+        tagline: "Téléchargez ServiceApp gratuitement sur Android ou iPhone en moins d'une minute !",
+        pill: 'Gratuit · Canada, Haïti, Guyane & Caraïbes',
+        step1: '1. Télécharger ServiceApp',
+        step2: '2. Ou écrivez-nous sur WhatsApp',
+        androidTitle: '🤖 Télécharger sur Android',
+        androidSub: 'Application officielle sur Google Play',
+        iosTitle: '🍎 Télécharger sur iPhone (iOS)',
+        iosSub: "Application officielle sur l'App Store",
+        webTitle: '🌐 Ouvrir le site ServiceApp',
+        cta: 'Télécharger →',
+        nameLabel: 'Votre prénom (optionnel)',
+        namePh: 'ex. Sophie',
+        msgLabel: 'Votre message sur ServiceApp',
+        msgPh: 'Bonjour ! Je veux télécharger ServiceApp...',
+        waBtn: '📲 Ouvrir le chat WhatsApp',
+        waDefault: 'Bonjour ! Je viens de {{source}}. Je veux télécharger ServiceApp !',
+        waGreet: 'Bonjour, je suis',
+        qrHint: 'Sur ordinateur ? Scannez avec votre téléphone pour ouvrir WhatsApp.',
+      },
+      nl: {
+        label: '🇸🇷 NL',
+        tagline: 'Download ServiceApp gratis voor Android of iPhone en meld je aan in 1 minuut!',
+        pill: 'Gratis App · Suriname, Aruba & Curaçao',
+        step1: '1. Download ServiceApp',
+        step2: '2. Of stuur ons een WhatsApp',
+        androidTitle: '🤖 Download voor Android',
+        androidSub: 'Officiële app in Google Play',
+        iosTitle: '🍎 Download voor iPhone (iOS)',
+        iosSub: 'Officiële app in de App Store',
+        webTitle: '🌐 Open ServiceApp Website',
+        cta: 'Downloaden →',
+        nameLabel: 'Je naam (optioneel)',
+        namePh: 'bijv. Milan',
+        msgLabel: 'Vraag over ServiceApp',
+        msgPh: 'Hoi! Ik wil ServiceApp downloaden...',
+        waBtn: '📲 Open WhatsApp-chat',
+        waDefault: 'Hoi! Via {{source}}. Ik wil ServiceApp downloaden!',
+        waGreet: 'Hoi, ik ben',
+        qrHint: 'Op desktop? Scan met je telefoon om WhatsApp te openen.',
+      },
+      ht: {
+        label: '🇭🇹 HT',
+        tagline: 'Telechaje ServiceApp gratis pou Android oswa iPhone epi enskri nan 1 minit!',
+        pill: 'Aplikasyon Gratis · Ayiti',
+        step1: '1. Telechaje ServiceApp',
+        step2: '2. Oswa ekri nou sou WhatsApp',
+        androidTitle: '🤖 Telechaje pou Android',
+        androidSub: 'Aplikasyon ofisyèl sou Google Play',
+        iosTitle: '🍎 Telechaje pou iPhone (iOS)',
+        iosSub: 'Aplikasyon ofisyèl sou App Store',
+        webTitle: '🌐 Louvri sit ServiceApp',
+        cta: 'Telechaje →',
+        nameLabel: 'Non ou (opsyonèl)',
+        namePh: 'egz. Jean',
+        msgLabel: 'Mesaj ou sou ServiceApp',
+        msgPh: 'Bonjou! Mwen vle telechaje ServiceApp...',
+        waBtn: '📲 Louvri chat WhatsApp',
+        waDefault: 'Bonjou! Mwen soti sou {{source}}. Mwen vle telechaje ServiceApp!',
+        waGreet: 'Bonjou, mwen se',
+        qrHint: 'Sou òdinatè? Eskane ak telefòn ou pou louvri WhatsApp.',
+      },
+      gn: {
+        label: '🇵🇾 GN',
+        tagline: 'Emboguejy ServiceApp reiete Android térã iPhone-pe ha eñemboheraguapy 1 aravo’ípe!',
+        pill: 'Reiete · Paraguay (Guaraní)',
+        step1: '1. Emboguejy ServiceApp',
+        step2: '2. Térã ehai oréve WhatsApp-pe',
+        androidTitle: '🤖 Emboguejy Android-pe',
+        androidSub: 'Google Play-pe',
+        iosTitle: '🍎 Emboguejy iPhone-pe',
+        iosSub: 'App Store-pe',
+        webTitle: '🌐 ServiceApp Web',
+        cta: 'Mboguejy →',
+        nameLabel: 'Nde réra',
+        namePh: 'techapyrã: Mateo',
+        msgLabel: 'Ne marandu ServiceApp rehegua',
+        msgPh: "Mba'éichapa! Aipota amboguejy ServiceApp...",
+        waBtn: '📲 Ehai WhatsApp-pe',
+        waDefault: "Mba'éichapa! ({{source}}). Aipota amboguejy ServiceApp!",
+        waGreet: "Mba'éichapa! Che ha'e",
+        qrHint: 'Eskanea ne celular-pe eike hag̃ua WhatsApp-pe.',
+      },
+    };
+
     const params = new URLSearchParams(window.location.search);
     let config = {
-      brand: {
-        name: 'ServiceApp',
-        tagline: "Pobierz darmową aplikację ServiceApp na Androida lub iPhone'a!",
-        avatarText: 'SA',
-      },
+      brand: { name: 'ServiceApp', avatarText: 'SA' },
       appLinks: {
         web: 'https://serviceapp.mobi',
         android: 'https://play.google.com/store/apps/details?id=com.serviceapp.mobile',
         ios: 'https://apps.apple.com/ie/app/pl-serviceapp/id1253478797',
       },
-      whatsapp: {
-        phone: '34627193784',
-        defaultCampaign: 'serviceapp-download',
-        defaultMessage: 'Cześć! Piszę z {{source}}. Chcę pobrać aplikację ServiceApp!',
-      },
-      rules: [],
+      whatsapp: { phone: '34627193784', defaultCampaign: 'serviceapp-download' },
     };
 
     try {
       const res = await fetch('./data/rules.json', { cache: 'no-store' });
       if (res.ok) config = await res.json();
     } catch {
-      // use fallback config
+      // fallback
     }
 
     const source = (params.get('src') || params.get('source') || 'social-bio').toLowerCase();
     const phone = params.get('phone') || config.whatsapp?.phone || '34627193784';
     const brandName = params.get('brand') || config.brand?.name || 'ServiceApp';
     const campaign = params.get('campaign') || config.whatsapp?.defaultCampaign || 'serviceapp-download';
-    const tagline = config.brand?.tagline || "Pobierz darmową aplikację ServiceApp na Androida lub iPhone'a!";
-    const avatarText = config.brand?.avatarText || 'SA';
 
-    document.title = `${brandName} — Pobierz aplikację`;
-    document.getElementById('brand-avatar').textContent = avatarText;
-    document.getElementById('brand-name').textContent = brandName;
-    document.getElementById('brand-tagline').textContent = tagline;
-
-    const sourceLabels = {
-      instagram: 'Instagram → ServiceApp',
-      facebook: 'Facebook → ServiceApp',
-      whatsapp: 'WhatsApp → ServiceApp',
-      github: 'GitHub → ServiceApp',
-    };
-    if (sourceLabels[source]) {
-      document.getElementById('source-pill').innerHTML = `<span class="status-dot"></span>${sourceLabels[source]} · Darmowa aplikacja`;
+    function detectInitialLang() {
+      const q = (params.get('lang') || '').toLowerCase().slice(0, 2);
+      if (I18N[q]) return q;
+      const browserLang = (navigator.language || 'pl').toLowerCase().slice(0, 2);
+      return I18N[browserLang] ? browserLang : 'en';
     }
 
-    // Detect visitor OS to highlight the right store button
+    let currentLang = detectInitialLang();
     const ua = navigator.userAgent || '';
     const isAndroid = /Android/i.test(ua);
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
-    const storeLinks = [
-      {
-        id: 'android',
-        title: '🤖 Pobierz na Androida',
-        subtitle: 'Oficjalna aplikacja w Google Play',
-        url: buildTrackedStoreUrl(params.get('android') || config.appLinks?.android || '', { source, campaign, ref: 'landing' }),
-        recommended: isAndroid || !isIOS,
-      },
-      {
-        id: 'ios',
-        title: '🍎 Pobierz na iPhone (iOS)',
-        subtitle: 'Oficjalna aplikacja w App Store',
-        url: buildTrackedStoreUrl(params.get('ios') || config.appLinks?.ios || '', { source, campaign, ref: 'landing' }),
-        recommended: isIOS,
-      },
-      {
-        id: 'web',
-        title: '🌐 Otwórz stronę ServiceApp',
-        subtitle: config.appLinks?.web || 'https://serviceapp.mobi',
-        url: buildTrackedStoreUrl(params.get('web') || config.appLinks?.web || 'https://serviceapp.mobi', { source, campaign, ref: 'landing' }),
-        recommended: false,
-      },
-    ];
+    function render() {
+      const t = I18N[currentLang] || I18N.en;
+      document.documentElement.lang = currentLang;
+      document.title = `${brandName} — ${t.step1}`;
+      document.getElementById('brand-avatar').textContent = config.brand?.avatarText || 'SA';
+      document.getElementById('brand-name').textContent = brandName;
+      document.getElementById('brand-tagline').textContent = t.tagline;
+      document.getElementById('source-pill').innerHTML = `<span class="status-dot"></span>${t.pill}`;
+      document.getElementById('lbl-step1').textContent = t.step1;
+      document.getElementById('lbl-step2').textContent = t.step2;
+      document.getElementById('lbl-name').textContent = t.nameLabel;
+      document.getElementById('visitor-name').placeholder = t.namePh;
+      document.getElementById('lbl-msg').textContent = t.msgLabel;
+      document.getElementById('visitor-msg').placeholder = t.msgPh;
+      document.getElementById('btn-wa-submit').textContent = t.waBtn;
+      document.getElementById('lbl-qr-hint').textContent = t.qrHint;
 
-    const storeContainer = document.getElementById('store-buttons');
-    storeContainer.innerHTML = '';
-    for (const item of storeLinks) {
-      if (!item.url) continue;
-      const a = document.createElement('a');
-      a.className = `store-btn${item.recommended ? ' recommended' : ''}`;
-      a.href = item.url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
+      // Render language bar
+      const langBar = document.getElementById('lang-bar');
+      langBar.innerHTML = '';
+      for (const [code, entry] of Object.entries(I18N)) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `lang-btn${code === currentLang ? ' active' : ''}`;
+        b.textContent = entry.label;
+        b.addEventListener('click', () => {
+          currentLang = code;
+          render();
+        });
+        langBar.appendChild(b);
+      }
 
-      const left = document.createElement('div');
-      left.style.textAlign = 'left';
-      const titleDiv = document.createElement('div');
-      titleDiv.textContent = item.title;
-      const sub = document.createElement('small');
-      sub.textContent = item.subtitle;
-      left.appendChild(titleDiv);
-      left.appendChild(sub);
+      // Render store links
+      const storeLinks = [
+        {
+          title: t.androidTitle,
+          subtitle: t.androidSub,
+          url: buildTrackedStoreUrl(params.get('android') || config.appLinks?.android || '', {
+            source,
+            campaign: `${campaign}-${currentLang}`,
+            ref: 'landing',
+          }),
+          recommended: isAndroid || !isIOS,
+        },
+        {
+          title: t.iosTitle,
+          subtitle: t.iosSub,
+          url: buildTrackedStoreUrl(params.get('ios') || config.appLinks?.ios || '', {
+            source,
+            campaign: `${campaign}-${currentLang}`,
+            ref: 'landing',
+          }),
+          recommended: isIOS,
+        },
+        {
+          title: t.webTitle,
+          subtitle: config.appLinks?.web || 'https://serviceapp.mobi',
+          url: buildTrackedStoreUrl(params.get('web') || config.appLinks?.web || 'https://serviceapp.mobi', {
+            source,
+            campaign: `${campaign}-${currentLang}`,
+            ref: 'landing',
+          }),
+          recommended: false,
+        },
+      ];
 
-      const arrow = document.createElement('span');
-      arrow.textContent = 'Pobierz →';
+      const storeContainer = document.getElementById('store-buttons');
+      storeContainer.innerHTML = '';
+      for (const item of storeLinks) {
+        if (!item.url) continue;
+        const a = document.createElement('a');
+        a.className = `store-btn${item.recommended ? ' recommended' : ''}`;
+        a.href = item.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
 
-      a.appendChild(left);
-      a.appendChild(arrow);
-      storeContainer.appendChild(a);
-    }
+        const left = document.createElement('div');
+        left.style.textAlign = 'left';
+        const titleDiv = document.createElement('div');
+        titleDiv.textContent = item.title;
+        const sub = document.createElement('small');
+        sub.textContent = item.subtitle;
+        left.appendChild(titleDiv);
+        left.appendChild(sub);
 
-    // Quick Click-to-WhatsApp links from active rules
-    const actionsEl = document.getElementById('quick-actions');
-    const activeRules = (config.rules || []).filter((r) => r.enabled !== false).slice(0, 4);
-    actionsEl.innerHTML = '';
-    for (const rule of activeRules) {
-      const url = buildWhatsAppUrl({
+        const arrow = document.createElement('span');
+        arrow.textContent = t.cta;
+
+        a.appendChild(left);
+        a.appendChild(arrow);
+        storeContainer.appendChild(a);
+      }
+
+      const defaultWaUrl = buildWhatsAppUrl({
         phone,
-        text: rule.whatsappCtaText || config.whatsapp?.defaultMessage || `Cześć! Chcę pobrać ${brandName}.`,
-        campaign,
+        text: t.waDefault,
+        campaign: `${campaign}-${currentLang}`,
         source,
-        username: `użytkownik z ${source}`,
-        keyword: rule.keywords?.[0] || 'app',
         brand: brandName,
         appName: brandName,
       });
 
-      const a = document.createElement('a');
-      a.className = 'action-btn';
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-
-      const titleSpan = document.createElement('span');
-      titleSpan.textContent = rule.name;
-      const arrowSpan = document.createElement('span');
-      arrowSpan.className = 'arrow';
-      arrowSpan.textContent = 'WhatsApp →';
-
-      a.appendChild(titleSpan);
-      a.appendChild(arrowSpan);
-      actionsEl.appendChild(a);
-    }
-
-    const defaultWaUrl = buildWhatsAppUrl({
-      phone,
-      text: config.whatsapp?.defaultMessage || `Cześć! Piszę z ${source}. Chcę pobrać aplikację ${brandName}!`,
-      campaign,
-      source,
-      brand: brandName,
-      appName: brandName,
-    });
-
-    if (defaultWaUrl) {
-      document.getElementById('landing-qr').innerHTML = generateQrSvg(defaultWaUrl, { pixelSize: 150, margin: 2 });
+      if (defaultWaUrl) {
+        document.getElementById('landing-qr').innerHTML = generateQrSvg(defaultWaUrl, { pixelSize: 150, margin: 2 });
+      }
     }
 
     document.getElementById('custom-wa-form').addEventListener('submit', (e) => {
       e.preventDefault();
+      const t = I18N[currentLang] || I18N.en;
       const name = document.getElementById('visitor-name').value.trim();
       const msg = document.getElementById('visitor-msg').value.trim();
       const finalMsg = [
-        name ? `Cześć, tu ${name}!` : 'Cześć!',
-        msg || `Chcę pobrać aplikację ${brandName}.`,
-        `(źródło: ${source}, kampania: ${campaign})`,
-      ].join(' ');
+        name ? `${t.waGreet} ${name}!` : '',
+        msg || t.waDefault.replace('{{source}}', source),
+        `(${source} / ${currentLang.toUpperCase()})`,
+      ]
+        .filter(Boolean)
+        .join(' ');
 
       const url = buildWhatsAppUrl({ phone, text: finalMsg, campaign, source, brand: brandName, appName: brandName });
       if (url) window.open(url, '_blank', 'noopener,noreferrer');
     });
+
+    render();
   </script>
 </body>
 </html>

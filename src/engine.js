@@ -112,6 +112,10 @@ export function buildWhatsAppUrl({
   return `${base}?text=${encodeURIComponent(rendered)}`;
 }
 
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export function matchKeyword(commentText, keyword, matchMode = 'contains', ignoreDiacritics = true) {
   if (!keyword || !commentText) return false;
 
@@ -135,8 +139,9 @@ export function matchKeyword(commentText, keyword, matchMode = 'contains', ignor
   if (matchMode === 'startsWith') {
     return normComment.startsWith(normKeyword);
   }
-  // default: contains (word-aware when possible, fallback substring for phrases)
-  return normComment.includes(normKeyword);
+  // default: word-boundary-aware contains so "download" does not hijack Dutch "downloaden" or "install" -> "installer"
+  const boundaryRe = new RegExp(`(^|[^\\p{L}\\p{N}])${escapeRegex(normKeyword)}([^\\p{L}\\p{N}]|$)`, 'u');
+  return boundaryRe.test(normComment);
 }
 
 export function matchRule(commentText, rules = [], options = {}) {
