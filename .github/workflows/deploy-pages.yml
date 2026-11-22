@@ -32,6 +32,8 @@ jobs:
 
       - name: Skonfiguruj GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Wyślij artefakt GitHub Pages
         uses: actions/upload-pages-artifact@v3
