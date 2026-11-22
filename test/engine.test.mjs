@@ -171,7 +171,7 @@ test('all North & South America languages match their dedicated ServiceApp rules
 });
 
 test('buildTrackedStoreUrl adds Google Play referrer, App Store ct and Web UTM params', () => {
-  const play = buildTrackedStoreUrl('https://play.google.com/store/apps/details?id=com.serviceapp.mobile', {
+  const play = buildTrackedStoreUrl('https://play.google.com/store/apps/details?id=pl.serviceapp&pli=1', {
     source: 'instagram',
     campaign: 'launch',
   });
