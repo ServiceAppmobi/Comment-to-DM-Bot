@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServiceApp Social Bot — Instagram, Facebook &amp; WhatsApp (GitHub Edition)</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-lockup">
+      <div class="brand-icon" id="brand-avatar">SA</div>
+      <div>
+        <h1 class="brand-title">ServiceApp Social Bot <span style="color:var(--accent);font-weight:600;font-size:13px;">GitHub Edition</span></h1>
+        <p class="brand-subtitle">Instagram, Facebook &amp; WhatsApp → zaproszenia do pobrania ServiceApp (bez Facebook Developers)</p>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="pill green"><span class="dot"></span>Instagram · Facebook · WhatsApp</span>
+      <span class="pill blue" id="runtime-mode-pill"><span class="dot"></span>Tryb: GitHub Pages (Static)</span>
+      <a class="btn btn-sm btn-primary" id="open-landing-btn" href="./whatsapp.html" target="_blank" rel="noopener noreferrer">Strona pobrania ServiceApp ↗</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="banner-notice">
+      <div>
+        <strong>Zero integracji z Facebookiem:</strong> Linki <code>wa.me</code>, kody QR, widget na stronę, strona Click-to-WhatsApp i bot komentarzy GitHub Actions działają natychmiast bez logowania do Meta Developers.
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-sm" id="btn-export-rules-top">Pobierz rules.json</button>
+        <button class="btn btn-sm" id="btn-reset-defaults">Przywróć domyślne</button>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="simulator" role="tab">⚡ Symulator Comment-to-DM</button>
+      <button class="tab-btn" data-tab="whatsapp" role="tab">📲 Click-to-WhatsApp Studio</button>
+      <button class="tab-btn" data-tab="rules" role="tab">🧠 Reguły Bota <span class="badge-count" id="rules-count">0</span></button>
+      <button class="tab-btn" data-tab="leads" role="tab">🎯 Leady &amp; Webhooki <span class="badge-count" id="leads-count">0</span></button>
+      <button class="tab-btn" data-tab="github" role="tab">🚀 GitHub &amp; Wdrożenie</button>
+    </nav>
+
+    <!-- TAB 1: SIMULATOR -->
+    <section class="panel active" id="panel-simulator">
+      <div class="grid-sim">
+        <!-- Left: Mock Social Post -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">1. Post / Wiadomość (Instagram, Facebook, WhatsApp)</h2>
+              <p class="card-desc">Wpisz komentarz lub wiadomość (np. <strong>APP</strong>, <strong>POBIERZ</strong>, <strong>WHATSAPP</strong>), aby wysłać zaproszenie do pobrania <strong>ServiceApp</strong>.</p>
+            </div>
+            <select id="sim-channel" style="width:auto;padding:6px 10px;">
+              <option value="instagram">Instagram</option>
+              <option value="facebook">Facebook</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="github">GitHub Issues</option>
+            </select>
+          </div>
+
+          <div class="social-post">
+            <div class="social-post-head">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="social-avatar" id="sim-post-avatar">SA</div>
+                <div>
+                  <div style="font-weight:700;font-size:13.5px;" id="sim-post-handle">@serviceapp</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);">Kampania pobrań ServiceApp (Android &amp; iOS)</div>
+                </div>
+              </div>
+              <span class="pill purple">Comment-to-DM</span>
+            </div>
+
+            <div class="social-post-visual">
+              <h3>Pobierz darmową aplikację ServiceApp!</h3>
+              <p>Napisz w komentarzu <strong>APP</strong> lub <strong>POBIERZ</strong> — bot od razu wyśle link do Google Play, App Store i WhatsApp!</p>
+              <div class="keyword-chips" id="sim-quick-keywords"></div>
+            </div>
+
+            <div class="comments-feed" id="sim-comments-feed"></div>
+
+            <form class="comment-composer" id="sim-comment-form">
+              <input type="text" id="sim-username" value="@jan_kowalski" placeholder="@uzytkownik" required />
+              <input type="text" id="sim-comment-input" placeholder="Napisz np. Poproszę APP albo POBIERZ!" required />
+              <button type="submit" class="btn btn-primary">Wyślij</button>
+            </form>
+          </div>
+
+          <div class="card-header" style="margin-top:16px;margin-bottom:8px;">
+            <span style="font-size:12.5px;font-weight:700;color:var(--text-muted);">LOGI SILNIKA AUTOMATYZACJI</span>
+            <button class="btn btn-sm" id="sim-reset-cooldown">Wyczyść cooldown &amp; czat</button>
+          </div>
+          <div class="log-box" id="sim-log-box"></div>
+        </div>
+
+        <!-- Right: Live DM Inbox & WhatsApp Handoff -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">2. Skrzynka DM &amp; Przejście na WhatsApp</h2>
+              <p class="card-desc">Symulacja rozmowy prywatnej + prawdziwy przycisk <strong>Click-to-WhatsApp</strong>.</p>
+            </div>
+            <span class="pill green" id="sim-active-user">Oczekiwanie na komentarz</span>
+          </div>
+
+          <div class="dm-shell">
+            <div class="dm-header">
+              <div>
+                <div style="font-weight:700;font-size:14px;" id="dm-thread-title">Wiadomości prywatne (Bot)</div>
+                <div style="font-size:11.5px;color:var(--text-muted);">Automatyczna kwalifikacja leada + przekierowanie wa.me</div>
+              </div>
+              <span class="pill blue">Auto-Reply</span>
+            </div>
+
+            <div class="dm-messages" id="sim-dm-messages">
+              <div class="dm-bubble system">Dodaj komentarz po lewej stronie (lub kliknij przycisk słowa kluczowego), aby uruchomić automatyczną wiadomość DM.</div>
+            </div>
+
+            <form class="dm-input-bar" id="sim-dm-form">
+              <input type="text" id="sim-dm-input" placeholder="Odpowiedz jako klient (np. jan@firma.pl lub 500 600 700)..." />
+              <button type="submit" class="btn btn-blue">Wyślij</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: CLICK-TO-WHATSAPP STUDIO -->
+    <section class="panel" id="panel-whatsapp">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Generator Click-to-WhatsApp (100% bez Facebooka)</h2>
+              <p class="card-desc">Działa od razu z Twoim zwykłym numerem WhatsApp lub WhatsApp Business przez oficjalny protokół <code>wa.me</code>.</p>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wa-phone">Numer telefonu WhatsApp (z kierunkowym)</label>
+              <input type="tel" id="wa-phone" placeholder="np. 48500600700" />
+              <div class="help-text">Możesz wpisać 9 cyfr (np. 500600700) — automatycznie doda +48.</div>
+            </div>
+            <div class="form-group">
+              <label for="wa-brand-name">Nazwa marki / firmy</label>
+              <input type="text" id="wa-brand-name" placeholder="np. Moja Marka" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wa-campaign">Kampania / Źródło (znacznik)</label>
+              <input type="text" id="wa-campaign" placeholder="np. instagram-bio" />
+            </div>
+            <div class="form-group">
+              <label for="wa-position">Pozycja widgetu na stronie</label>
+              <select id="wa-position">
+                <option value="right">Prawy dolny róg</option>
+                <option value="left">Lewy dolny róg</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="wa-message">Gotowa wiadomość początkowa (pre-filled text)</label>
+            <textarea id="wa-message"></textarea>
+            <div class="help-text">Zmienne: <code>{{campaign}}</code>, <code>{{brand}}</code>. Klient zobaczy tę treść od razu po kliknięciu.</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wa-greeting">Dymek powitalny widgetu</label>
+              <input type="text" id="wa-greeting" />
+            </div>
+            <div class="form-group">
+              <label for="wa-btn-label">Tekst przycisku widgetu</label>
+              <input type="text" id="wa-btn-label" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="wa-app-web">Strona ServiceApp (Web URL)</label>
+            <input type="url" id="wa-app-web" placeholder="https://serviceapp.mobi" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wa-app-android">Link Google Play (Android)</label>
+              <input type="url" id="wa-app-android" placeholder="https://play.google.com/store/apps/details?id=..." />
+            </div>
+            <div class="form-group">
+              <label for="wa-app-ios">Link App Store (iPhone / iOS)</label>
+              <input type="url" id="wa-app-ios" placeholder="https://apps.apple.com/..." />
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-primary" id="btn-save-wa">Zapisz ustawienia ServiceApp &amp; WhatsApp</button>
+            <button class="btn" id="btn-toggle-widget-preview">Podgląd widgetu na żywo</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Gotowe Linki (Instagram, Facebook, WhatsApp) + Kod QR</h2>
+              <p class="card-desc">Każdy kanał dostaje własny link z atrybucją <code>src</code> do strony pobrania <strong>ServiceApp</strong> i WhatsApp.</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Twój bezpośredni link Click-to-WhatsApp (wa.me)</label>
+            <div class="code-block" id="wa-generated-url"></div>
+            <div class="btn-group" style="margin-top:10px;">
+              <button class="btn btn-primary btn-sm" id="btn-copy-wa-url">Kopiuj link wa.me</button>
+              <a class="btn btn-sm" id="btn-test-wa-url" href="#" target="_blank" rel="noopener noreferrer">Otwórz w WhatsApp ↗</a>
+              <a class="btn btn-sm btn-blue" id="btn-open-bio-page" href="./whatsapp.html" target="_blank" rel="noopener noreferrer">Strona pobrania ServiceApp ↗</a>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:14px;">
+            <label>Gotowe linki na 3 kanały (wklej w Bio / Posty / Profil WhatsApp)</label>
+            <div class="btn-group" id="channel-links-bar">
+              <button type="button" class="btn btn-sm" data-copy-channel="instagram">📸 Kopiuj link pod Instagram</button>
+              <button type="button" class="btn btn-sm" data-copy-channel="facebook">📘 Kopiuj link pod Facebook</button>
+              <button type="button" class="btn btn-sm" data-copy-channel="whatsapp">📲 Kopiuj link pod WhatsApp</button>
+            </div>
+            <div class="help-text">Linki otwierają Twoją stronę <code>whatsapp.html</code> z automatycznym wykrywaniem Android/iOS i śledzeniem kanału.</div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:18px;">
+            <div class="qr-preview-box">
+              <div id="wa-qr-container"></div>
+              <span style="font-size:11.5px;font-weight:700;">Zeskanuj aparatem → WhatsApp</span>
+            </div>
+            <div style="flex:1;min-width:190px;">
+              <h3 style="margin:0 0 6px;font-size:15px;">Kod QR (100% offline)</h3>
+              <p style="margin:0 0 12px;font-size:13px;color:var(--text-muted);">Wygenerowany lokalnie bez żadnych zewnętrznych API. Idealny na ulotki, wizytówki, posty i prezentacje.</p>
+              <div class="btn-group">
+                <button class="btn btn-sm" id="btn-download-qr-svg">Pobierz SVG</button>
+                <button class="btn btn-sm" id="btn-download-qr-png">Pobierz PNG</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Widget Click-to-WhatsApp na dowolną stronę WWW (HTML)</h2>
+            <p class="card-desc">Wklej poniższy kod przed <code>&lt;/body&gt;</code> na swojej stronie, WordPressie lub GitHub Pages.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-copy-widget">Kopiuj kod HTML widgetu</button>
+        </div>
+        <pre class="code-block" id="wa-widget-code"></pre>
+      </div>
+    </section>
+
+    <!-- TAB 3: RULES -->
+    <section class="panel" id="panel-rules">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Aktywne reguły Comment-to-DM</h2>
+              <p class="card-desc">Te same reguły napędzają symulator i prawdziwego bota GitHub Actions (<code>data/rules.json</code>).</p>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary" id="btn-new-rule">+ Nowa reguła</button>
+              <label class="btn btn-sm" style="margin:0;cursor:pointer;">
+                Importuj JSON
+                <input type="file" id="input-import-rules" accept="application/json" style="display:none;" />
+              </label>
+            </div>
+          </div>
+          <div id="rules-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title" id="rule-form-title">Edytuj regułę</h2>
+              <p class="card-desc">Zmienne: <code>{{username}}</code>, <code>{{keyword}}</code>, <code>{{app_name}}</code>, <code>{{app_url}}</code>, <code>{{android_url}}</code>, <code>{{ios_url}}</code>, <code>{{whatsapp_link}}</code>.</p>
+            </div>
+          </div>
+
+          <form id="rule-editor-form">
+            <input type="hidden" id="rule-id" />
+            <div class="form-row">
+              <div class="form-group">
+                <label for="rule-name">Nazwa reguły</label>
+                <input type="text" id="rule-name" required placeholder="np. Cennik usług" />
+              </div>
+              <div class="form-group">
+                <label for="rule-match-mode">Tryb dopasowania</label>
+                <select id="rule-match-mode">
+                  <option value="contains">Zawiera słowo (zalecane)</option>
+                  <option value="exact">Dokładnie równe</option>
+                  <option value="startsWith">Zaczyna się od</option>
+                  <option value="regex">Wyrażenie regularne (RegEx)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="rule-keywords">Słowa kluczowe (po przecinku)</label>
+                <input type="text" id="rule-keywords" required placeholder="cennik, cena, oferta, koszt" />
+              </div>
+              <div class="form-group">
+                <label for="rule-cooldown">Anty-spam cooldown (minuty)</label>
+                <input type="number" id="rule-cooldown" min="0" max="1440" value="15" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="rule-public-replies">Publiczne odpowiedzi pod komentarzem (1 wariant = 1 linia)</label>
+              <textarea id="rule-public-replies" rows="3"></textarea>
+              <div class="help-text">Bot losuje jeden wariant, aby uniknąć powtarzalnych odpowiedzi.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="rule-dm-message">Treść wiadomości prywatnej (DM)</label>
+              <textarea id="rule-dm-message" rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="rule-wa-cta">Wiadomość po kliknięciu „Przejdź na WhatsApp”</label>
+              <input type="text" id="rule-wa-cta" placeholder="Cześć! Jestem {{username}}, komentowałem {{keyword}}." />
+            </div>
+
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary">Zapisz regułę</button>
+              <button type="button" class="btn" id="btn-export-rules-tab">Pobierz data/rules.json do GitHuba</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: LEADS & WEBHOOKS -->
+    <section class="panel" id="panel-leads">
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="stat-label">Wszystkie leady</div>
+          <div class="stat-value" id="stat-total-leads">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Z danymi kontaktowymi</div>
+          <div class="stat-value" style="color:#4ade80;" id="stat-qualified-leads">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Przekierowane na WhatsApp</div>
+          <div class="stat-value" style="color:#38bdf8;" id="stat-wa-leads">0</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Zebrane leady</h2>
+            <p class="card-desc">Eksportuj jednym kliknięciem do Excela (CSV z polskimi znakami) lub JSON.</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary btn-sm" id="btn-export-csv">Eksportuj CSV (Excel)</button>
+            <button class="btn btn-sm" id="btn-export-leads-json">Eksportuj JSON</button>
+            <button class="btn btn-danger btn-sm" id="btn-clear-leads">Wyczyść listę</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Użytkownik</th>
+                <th>Kanał / Reguła</th>
+                <th>Komentarz</th>
+                <th>Kontakt (e-mail / tel)</th>
+                <th>Status</th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Opcjonalny Webhook zewnętrzny (Discord / Slack / n8n / Make)</h2>
+            <p class="card-desc">Wysyłaj nowe leady bezpośrednio na Discorda, Slacka lub do Make/n8n — bez konta Facebook Developers.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="wh-url">URL Webhooka</label>
+            <input type="url" id="wh-url" placeholder="https://discord.com/api/webhooks/... lub https://hook.eu1.make.com/..." />
+          </div>
+          <div class="form-group">
+            <label for="wh-format">Format payloadu</label>
+            <select id="wh-format">
+              <option value="generic">Uniwersalny JSON (n8n / Make / Zapier)</option>
+              <option value="discord">Discord Webhook</option>
+              <option value="slack">Slack Incoming Webhook</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="wh-enabled" style="width:auto;" />
+          <label for="wh-enabled" style="margin:0;cursor:pointer;">Automatycznie wysyłaj każdy nowy lead na webhook</label>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary btn-sm" id="btn-save-wh">Zapisz webhook</button>
+          <button class="btn btn-sm" id="btn-test-wh">Wyślij testowy lead</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: GITHUB & DEPLOY -->
+    <section class="panel" id="panel-github">
+      <div class="grid-2">
+        <div class="card">
+          <h2 class="card-title">Jak uruchomić projekt na GitHubie w 3 minuty</h2>
+          <p class="card-desc">Projekt nie wymaga żadnego konta Facebook Developers, żadnych kluczy API ani nawet instalacji <code>npm</code>.</p>
+
+          <div class="steps-list">
+            <div class="step-card">
+              <h4>Krok 1: Wypchnij repozytorium na GitHub</h4>
+              <p>Utwórz nowe repozytorium na GitHubie i wrzuć pliki z folderu projektu (<code>git push</code> lub przez przeglądarkę).</p>
+            </div>
+            <div class="step-card">
+              <h4>Krok 2: Włącz GitHub Pages</h4>
+              <p>W repozytorium wejdź w <strong>Settings → Pages → Source: GitHub Actions</strong>. Workflow <code>deploy-pages.yml</code> automatycznie opublikuje ten panel oraz stronę <code>/whatsapp.html</code>.</p>
+            </div>
+            <div class="step-card">
+              <h4>Krok 3: Wpisz swój numer WhatsApp w data/rules.json</h4>
+              <p>Skonfiguruj numer i reguły w zakładce <strong>Click-to-WhatsApp Studio</strong>, kliknij <strong>Pobierz rules.json</strong> i podmień plik <code>data/rules.json</code> w repozytorium.</p>
+            </div>
+            <div class="step-card">
+              <h4>Krok 4: Prawdziwy Bot komentarzy w GitHub Actions (gratis!)</h4>
+              <p>Workflow <code>github-comment-bot.yml</code> działa automatycznie w zakładce <strong>Issues</strong> Twojego repozytorium. Gdy ktoś napisze komentarz ze słowem np. <code>CENNIK</code> lub <code>WHATSAPP</code>, bot sam odpowie i wygeneruje spersonalizowany link Click-to-WhatsApp (używa wbudowanego <code>GITHUB_TOKEN</code>).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Co działa realnie bez integracji z Facebookiem?</h2>
+          <p class="card-desc">Uczciwy podział możliwości technicznych:</p>
+
+          <div class="steps-list">
+            <div class="step-card">
+              <h4>✅ Click-to-WhatsApp (100% produkcyjne)</h4>
+              <p>Linki <code>https://wa.me/48...</code>, kody QR, strona <code>whatsapp.html</code> (Link-in-Bio) i pływający widget HTML działają od razu z każdym numerem WhatsApp — zero rejestracji w Meta Developers.</p>
+            </div>
+            <div class="step-card">
+              <h4>✅ Bot komentarzy na GitHubie (100% produkcyjne)</h4>
+              <p>GitHub Actions (<code>scripts/github-bot.mjs</code>) automatycznie skanuje komentarze pod Issues/PR, dopasowuje reguły z <code>data/rules.json</code> i publikuje odpowiedzi z przyciskiem WhatsApp.</p>
+            </div>
+            <div class="step-card">
+              <h4>✅ Symulator Comment-to-DM &amp; CRM Leadów</h4>
+              <p>Pozwala zaprojektować, przetestować i pokazać klientowi cały lejek Instagram/FB Comment-to-DM + eksport leadów CSV/Webhook bez dostępu do konta Meta.</p>
+            </div>
+            <div class="step-card">
+              <h4>ℹ️ Wysyłanie prawdziwych DM na Instagramie/FB</h4>
+              <p>Meta blokuje wysyłanie prywatnych wiadomości bez tokenu aplikacji Meta — dlatego ten projekt daje Ci działający zamiennik (Click-to-WhatsApp + Link-in-Bio + GitHub Bot + gotowy silnik reguł <code>src/engine.js</code>, który kiedyś możesz łatwo podpiąć pod API).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="live-widget-mount"></div>
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

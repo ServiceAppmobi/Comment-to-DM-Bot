@@ -1,0 +1,23 @@
+{
+  "name": "social-bot-github",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Automatyzacja Social Media (Comment-to-DM & Click-to-WhatsApp) działająca w 100% na GitHub Pages i GitHub Actions bez integracji z Facebook / Meta Developer API.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "click-to-whatsapp",
+    "comment-to-dm",
+    "github-pages",
+    "github-actions",
+    "social-media-automation",
+    "chatbot"
+  ],
+  "license": "MIT"
+}

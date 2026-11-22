@@ -1,0 +1,32 @@
+name: GitHub Comment-to-Reply & Click-to-WhatsApp Bot
+
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  auto-reply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobierz kod repozytorium
+        uses: actions/checkout@v4
+
+      - name: Ustaw Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Uruchom bota komentarzy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WHATSAPP_PHONE: ${{ vars.WHATSAPP_PHONE }}
+          OUTBOUND_WEBHOOK_URL: ${{ secrets.OUTBOUND_WEBHOOK_URL }}
+          OUTBOUND_WEBHOOK_FORMAT: ${{ vars.OUTBOUND_WEBHOOK_FORMAT }}
+        run: node scripts/github-bot.mjs

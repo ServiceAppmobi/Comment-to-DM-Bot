@@ -1,100 +1,83 @@
-# 📩 ServiceApp — Bot Comment-to-DM (Instagram & Facebook)
+# ServiceApp Social Bot — GitHub Edition (Instagram, Facebook & WhatsApp)
 
-W pełni automatyczny, bezzależnościowy (czysty Python 3.9+) bot **Comment-to-DM** działający **24/7 w chmurze GitHub Actions** (identycznie jak `ServiceApp LatAm Lead Monitor`) dla **Instagrama** i **Facebooka**.
+Kompletny bot i studio automatyzacji dla **ServiceApp** (**Comment-to-DM** + **Click-to-WhatsApp** + **strona pobierania aplikacji**), które działa w **100% na GitHub Pages i GitHub Actions** — **bez logowania do Facebooka i bez konta Meta for Developers**.
 
-Gdy ktoś zostawi komentarz ze słowem kluczowym pod Twoim postem lub rolką (np. `APP`, `LINK`, `POBIERZ`, `QUERO`, `BAIXAR`, `DESCARGAR`), bot:
-1. Automatycznie wysyła **prywatną wiadomość (DM)** z linkami do **ServiceApp** (poprzez oficjalne **Meta Private Replies API**).
-2. Opcjonalnie dodaje **losową publiczną odpowiedź** pod komentarzem (*„Wysłane w wiadomości prywatnej! 📩”*), zwiększając zasięg posta i unikając flagi spamu.
-3. Pilnuje **deduplikacji** w bazie SQLite (`comment_dm.db` zapisywanej w GitHub Actions Cache) — nigdy nie wyśle tej samej osobie dwóch DM pod jednym postem.
-4. Publikuje czytelny raport w **GitHub Mobile (Summary)** oraz opcjonalnie wysyła powiadomienia na iPhone (**Resend E-mail**, **ntfy Push**, **Telegram**).
+Cel główny bota: **zapraszanie użytkowników z Instagrama, Facebooka i WhatsAppa do pobrania i rejestracji w aplikacji ServiceApp** (Android Google Play, iPhone App Store, strona `serviceapp.mobi`).
 
 ---
 
-## ⚙️ Jak to działa na GitHubie (bez żadnego serwera)?
+## Co działa od razu bez integracji z Facebookiem?
 
-Workflow [.github/workflows/comment-to-dm-bot.yml](.github/workflows/comment-to-dm-bot.yml) uruchamia się automatycznie **co 10 minut** (`cron: '*/10 * * * *'`):
-- Pobiera ostatnie posty/rolki z Instagrama i strony na Facebooku.
-- Sprawdza nowe komentarze młodsze niż 6 dni (bezpiecznie wewnątrz 7-dniowego okna Meta Private Replies).
-- Dopasowuje słowa kluczowe z pliku [rules.json](rules.json) (odporne na wielkość liter i polskie/portugalskie/hiszpańskie znaki diakrytyczne).
-- Wysyła DM i publiczną odpowiedź, a następnie zapisuje stan bazy `comment_dm.db` w cache GitHub Actions.
+1. **Smart Strona Pobierania ServiceApp + Click-to-WhatsApp (`whatsapp.html`) — 100% produkcyjne**
+   - Jeden link na **Instagrama** (`whatsapp.html?src=instagram`), **Facebooka** (`whatsapp.html?src=facebook`) i **WhatsAppa** (`whatsapp.html?src=whatsapp`).
+   - Automatycznie wykrywa telefon odwiedzającego (**Android → wyróżnia Google Play**, **iPhone → wyróżnia App Store**, **komputer → pokazuje kod QR**).
+   - Dodaje parametry śledzenia kampanii (`referrer=utm_source=...` dla Google Play, `ct=...` dla App Store, `utm_source` dla WWW).
+   - Zawiera gotowe przyciski **Click-to-WhatsApp (`wa.me`)**, które działają ze zwykłym numerem WhatsApp bez żadnego API Meta.
+2. **Click-to-WhatsApp & ServiceApp Studio (`index.html`)**
+   - Edycja linków **ServiceApp** (Web / Google Play / App Store) oraz numeru WhatsApp.
+   - 1-klik kopiowania gotowych linków na **Instagrama**, **Facebooka** i **WhatsAppa**.
+   - **Generator kodów QR 100% offline** (SVG i PNG) oraz **pływający widget HTML/JS** na dowolną stronę WWW.
+3. **Prawdziwy Bot komentarzy w GitHub Actions (`.github/workflows/github-comment-bot.yml`)**
+   - Reaguje na słowa kluczowe z `data/rules.json` (m.in. `APP`, `POBIERZ`, `SERVICEAPP`, `WHATSAPP`, a także PT-BR `BAIXAR` i ES-MX `DESCARGAR`) i automatycznie wysyła zaproszenie do pobrania ServiceApp + link `wa.me` (korzysta wyłącznie z wbudowanego `GITHUB_TOKEN`).
+4. **Symulator Comment-to-DM (Instagram / Facebook / WhatsApp) + Mini-CRM Leadów**
+   - Testowanie pełnego lejka (komentarz/wiadomość → odpowiedź publiczna → DM z linkami do Google Play, App Store i WhatsApp → kwalifikacja leada → eksport CSV pod Excela lub Webhook Discord/Slack/Make/n8n).
 
----
-
-## 🔑 Konfiguracja sekretów na GitHubie
-
-W repozytorium GitHub przejdź do:
-**Settings → Secrets and variables → Actions → New repository secret**
-
-| Sekret | Wymagany? | Opis |
-| --- | --- | --- |
-| `META_ACCESS_TOKEN` | **Tak** | Długoterminowy Page Access Token / System User Token z Meta Business |
-| `IG_USER_ID` | Dla IG | ID konta profesjonalnego Instagram (np. `178414...`) |
-| `IG_USERNAME` | Opcjonalny | Login IG bez `@` (filtruje własne komentarze; bot wykrywa też sam z API) |
-| `FB_PAGE_ID` | Dla FB | ID strony na Facebooku (Fanpage) |
-| `FB_PAGE_ACCESS_TOKEN` | Opcjonalny | Osobny token dla FB Page (jeśli inny niż `META_ACCESS_TOKEN`) |
-| `APP_NAME` | Opcjonalny | Domyślnie `ServiceApp` |
-| `APP_URL` | Opcjonalny | Domyślnie `https://serviceapp.mobi` |
-| `ANDROID_STORE_URL` | Opcjonalny | Link do Google Play |
-| `IOS_STORE_URL` | Opcjonalny | Link do App Store |
-| `RESEND_API_KEY` | Opcjonalny | Raporty e-mail przez Resend |
-| `EMAIL_RECIPIENT` | Opcjonalny | Odbiorca raportów e-mail |
-| `EMAIL_SENDER` | Opcjonalny | Nadawca e-mail |
-| `NTFY_TOPIC` | Opcjonalny | Natywny Push na iPhone przez aplikację **ntfy** |
-| `TELEGRAM_BOT_TOKEN` | Opcjonalny | Powiadomienia Telegram |
-| `TELEGRAM_CHAT_ID` | Opcjonalny | ID czatu Telegram |
-| `GEMINI_API_KEY` | Opcjonalny | Personalizacja treści DM przez Google Gemini (gdy `ai_personalize: true`) |
-
-### Skąd wziąć `META_ACCESS_TOKEN`, `IG_USER_ID` i `FB_PAGE_ID`?
-1. Upewnij się, że konto na Instagramie jest **Profesjonalne** (Firmowe lub Twórcy) i połączone ze stroną na Facebooku.
-2. W aplikacji Instagram włącz: *Ustawienia → Wiadomości i odpowiedzi na relacje → Zarządzanie wiadomościami → Zezwalaj na dostęp do wiadomości*.
-3. W [Meta for Developers](https://developers.facebook.com/) utwórz aplikację typu **Business** i dodaj uprawnienia:
-   - Instagram: `instagram_basic`, `instagram_manage_comments`, `instagram_manage_messages`
-   - Facebook: `pages_show_list`, `pages_read_engagement`, `pages_manage_metadata`, `pages_messaging`
-4. W **Meta Business Settings → System Users** wygeneruj stały (nie wygasający) token z dostępem do Twojej strony FB i konta IG — wklej go jako `META_ACCESS_TOKEN`.
-5. W [Graph API Explorer](https://developers.facebook.com/tools/explorer/) wywołaj:
-   ```
-   GET /me/accounts?fields=id,name,instagram_business_account
-   ```
-   - `id` → to Twoje `FB_PAGE_ID`
-   - `instagram_business_account.id` → to Twoje `IG_USER_ID`
-6. Po wpisaniu sekretów na GitHubie uruchom w zakładce **Actions** tryb **`test-meta`**, aby zweryfikować połączenie jednym kliknięciem.
+> **Uwaga techniczna:** Meta/Facebook nie pozwala na automatyczne wysyłanie prywatnych wiadomości DM na Instagramie/Facebooku bez tokenu z aplikacji Meta Developers. Ten projekt daje Ci w pełni działającą alternatywę na GitHubie (Click-to-WhatsApp + strona Link-in-Bio + GitHub Comment Bot + symulator i silnik `src/engine.js`, który w przyszłości można łatwo podpiąć pod API).
 
 ---
 
-## ✏️ Edycja słów kluczowych i wiadomości (nawet z iPhone'a)
+## Wdrożenie na GitHubie w 3 minuty
 
-Wszystkie kampanie, słowa kluczowe, treści DM i warianty publicznych odpowiedzi znajdują się w pliku **[rules.json](rules.json)**.
-Możesz edytować ten plik bezpośrednio w przeglądarce lub aplikacji GitHub — zmiana zadziała automatycznie już przy kolejnym uruchomieniu co 10 minut.
+### 1. Wypchnij repozytorium na GitHub
+```bash
+git init
+git add .
+git commit -m "Initial commit: Social Bot Studio (GitHub Edition)"
+git branch -M main
+git remote add origin https://github.com/TWOJ_LOGIN/social-bot-github.git
+git push -u origin main
+```
 
-Dostępne zmienne w szablonie `dm_text`:
-- `{username}` – nazwa autora komentarza
-- `{app_name}` – nazwa aplikacji (`ServiceApp`)
-- `{app_url}` – główny link strony
-- `{android_url}` – link Google Play
-- `{ios_url}` – link App Store
-- `{keyword}` – słowo kluczowe, które wyzwoliło bota
+### 2. Włącz GitHub Pages
+1. Wejdź w swoje repozytorium na GitHubie → **Settings → Pages**.
+2. W sekcji **Build and deployment → Source** wybierz **GitHub Actions**.
+3. Workflow `.github/workflows/deploy-pages.yml` opublikuje automatycznie:
+   - Panel główny: `https://TWOJ_LOGIN.github.io/social-bot-github/`
+   - Publiczną stronę Click-to-WhatsApp (do bio): `https://TWOJ_LOGIN.github.io/social-bot-github/whatsapp.html`
+
+### 3. Ustaw swój numer WhatsApp i reguły
+- Edytuj bezpośrednio plik [`data/rules.json`](./data/rules.json) (pole `whatsapp.phone`) **lub** ustaw wszystko wygodnie w zakładce **Click-to-WhatsApp Studio**, kliknij **Pobierz rules.json** i podmień plik w repozytorium.
+- Opcjonalnie dla bota GitHub Actions możesz ustawić w **Settings → Secrets and variables → Actions**:
+  - Variable `WHATSAPP_PHONE` (np. `48500600700`) — nadpisuje numer telefonu dla bota.
+  - Secret `OUTBOUND_WEBHOOK_URL` — opcjonalny webhook (Discord / Slack / Make / n8n) do powiadomień o leadach.
 
 ---
 
-## 🚀 Uruchamianie lokalne i testy
+## Uruchomienie lokalne (opcjonalne, zero `npm install`)
+
+Wymagany wyłącznie Node.js 20+ (projekt nie ma żadnych zewnętrznych paczek!):
 
 ```bash
-# Testy jednostkowe i integracyjne
-python3 -m unittest discover -s tests -v
+# Uruchom lokalny serwer z zapisem data/rules.json i data/leads.json
+npm start
 
-# Symulacja pełnego cyklu na przykładowych komentarzach IG & FB (bez tokenów Meta)
-python3 main.py --mock --dry-run
+# Uruchom testy jednostkowe
+npm test
 
-# Zapis wyników symulacji do lokalnej bazy i sprawdzenie statystyk
-python3 main.py --mock
-python3 main.py --stats
-
-# Weryfikacja połączenia z Meta Graph API (po uzupełnieniu .env)
-python3 main.py --test-meta
-
-# Jednorazowy cykl produkcyjny
-python3 main.py
-
-# Opcjonalny serwer Webhook czasu rzeczywistego (jeśli kiedyś przeniesiesz na VPS/Railway)
-python3 main.py --webhook-server
+# Przetestuj bota GitHub Actions lokalnie (tryb dry-run)
+BOT_DRY_RUN=1 COMMENT_AUTHOR=janek COMMENT_BODY="Poprosze CENNIK" node scripts/github-bot.mjs
 ```
+
+---
+
+## Struktura projektu
+
+- `index.html` — Panel Social Bot Studio (Symulator, Click-to-WhatsApp Studio, Reguły, Leady, Instrukcja GitHub)
+- `whatsapp.html` — Gotowa, publiczna strona Click-to-WhatsApp / Link-in-Bio
+- `data/rules.json` — Centralna konfiguracja numeru WhatsApp, marki i reguł słów kluczowych
+- `src/engine.js` — Wspólny silnik dopasowania reguł, anty-spamu, linków `wa.me` i eksportu CSV
+- `src/qr.js` — Czysty generator kodów QR (ISO/IEC 18004, SVG/PNG, 100% offline)
+- `src/widget-generator.js` — Generator pływającego widgetu HTML/JS Click-to-WhatsApp
+- `scripts/github-bot.mjs` — Skrypt bota komentarzy uruchamiany przez GitHub Actions
+- `server.mjs` — Opcjonalny lokalny serwer Node.js (zero zależności)
+- `.github/workflows/` — Gotowe workflow: `deploy-pages.yml`, `github-comment-bot.yml`, `ci.yml`

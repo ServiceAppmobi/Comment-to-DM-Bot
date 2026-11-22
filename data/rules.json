@@ -1,0 +1,210 @@
+{
+  "brand": {
+    "name": "ServiceApp",
+    "handle": "@serviceapp",
+    "tagline": "Pobierz darmową aplikację ServiceApp na Androida lub iPhone'a i znajdź zlecenia lub fachowca w minutę!",
+    "avatarText": "SA",
+    "accentColor": "#25D366"
+  },
+  "appLinks": {
+    "web": "https://serviceapp.mobi",
+    "android": "https://play.google.com/store/apps/details?id=com.serviceapp.mobile",
+    "ios": "https://apps.apple.com/ie/app/pl-serviceapp/id1253478797"
+  },
+  "whatsapp": {
+    "phone": "34627193784",
+    "defaultMessage": "Cześć! Piszę z {{source}} (kampania: {{campaign}}). Chcę pobrać aplikację ServiceApp!",
+    "defaultCampaign": "serviceapp-download",
+    "greetingBubble": "Pobierz ServiceApp lub napisz na WhatsApp!",
+    "buttonLabel": "Pobierz ServiceApp / WhatsApp",
+    "widgetPosition": "right"
+  },
+  "webhook": {
+    "url": "",
+    "format": "generic",
+    "enabled": false
+  },
+  "rules": [
+    {
+      "id": "serviceapp-download-pl",
+      "name": "ServiceApp Polska — Zaproszenie do pobrania aplikacji",
+      "enabled": true,
+      "channels": ["instagram", "facebook", "whatsapp", "github"],
+      "keywords": [
+        "app",
+        "link",
+        "pobierz",
+        "aplikacja",
+        "serviceapp",
+        "info",
+        "chce",
+        "zlecenia",
+        "uslugi"
+      ],
+      "matchMode": "contains",
+      "ignoreDiacritics": true,
+      "cooldownMinutes": 15,
+      "publicReplies": [
+        "Cześć {{username}}! Link do pobrania {{app_name}} wysłany w wiadomości prywatnej 📩 Sprawdź DM!",
+        "Hej {{username}}! Oficjalne linki do {{app_name}} (Android i iPhone) już czekają w Twojej skrzynce 🚀",
+        "Dzięki za komentarz {{username}}! Wysłałem Ci zaproszenie do pobrania {{app_name}} na DM 💬✨",
+        "Gotowe {{username}}! Zajrzyj do wiadomości prywatnych (również folder Inne/Prośby) 📬"
+      ],
+      "dmMessage": "Cześć {{username}}! 👋 Dzięki za wiadomość ze słowem \"{{keyword}}\"!\n\nZapraszamy do pobrania darmowej aplikacji {{app_name}}:\n🌐 Strona: {{app_url}}\n🤖 Android (Google Play): {{android_url}}\n🍎 iPhone (App Store): {{ios_url}}\n\nRejestracja zajmuje mniej niż minutę. Wybierz swój telefon poniżej lub napisz na WhatsApp:",
+      "quickReplies": [
+        {
+          "label": "🤖 Pobierz na Androida",
+          "reply": "Świetnie! Pobierz {{app_name}} z Google Play tutaj:\n👉 {{android_url}}\n\nJeśli chcesz pomoc z rejestracją, podaj swój numer lub kliknij WhatsApp poniżej.",
+          "actionUrl": "{{android_url}}",
+          "actionLabel": "🤖 Otwórz Google Play",
+          "leadTag": "android-download"
+        },
+        {
+          "label": "🍎 Pobierz na iPhone (iOS)",
+          "reply": "Super! Pobierz {{app_name}} z App Store tutaj:\n👉 {{ios_url}}\n\nW razie pytań odpisz tutaj lub przejdź na nasz WhatsApp!",
+          "actionUrl": "{{ios_url}}",
+          "actionLabel": "🍎 Otwórz App Store",
+          "leadTag": "ios-download"
+        },
+        {
+          "label": "📲 Pomoc na WhatsApp",
+          "reply": "Kliknij przycisk poniżej — przeniesie Cię prosto na nasz WhatsApp z gotową wiadomością!",
+          "openWhatsApp": true,
+          "whatsappText": "Cześć! Jestem {{username}} (kanał: {{source}}), chcę pobrać i zarejestrować się w ServiceApp.",
+          "leadTag": "whatsapp-handoff"
+        }
+      ],
+      "whatsappCtaText": "Cześć! Jestem {{username}} (z {{source}}, słowo: {{keyword}}). Chcę pobrać aplikację ServiceApp!"
+    },
+    {
+      "id": "serviceapp-whatsapp-pl",
+      "name": "ServiceApp — Rejestracja i kontakt przez WhatsApp",
+      "enabled": true,
+      "channels": ["instagram", "facebook", "whatsapp", "github"],
+      "keywords": [
+        "whatsapp",
+        "pomoc",
+        "rejestracja",
+        "kontakt",
+        "jak pobrac",
+        "cennik",
+        "konto"
+      ],
+      "matchMode": "contains",
+      "ignoreDiacritics": true,
+      "cooldownMinutes": 5,
+      "publicReplies": [
+        "Hej {{username}}! Wysłaliśmy Ci link do pobrania {{app_name}} oraz bezpośredni kontakt na WhatsApp 📲",
+        "{{username}}, najszybciej pomożemy Ci z instalacją {{app_name}} na WhatsAppie — sprawdź wiadomość prywatną!"
+      ],
+      "dmMessage": "Cześć {{username}}! 📲 Chętnie pomożemy Ci pobrać i uruchomić {{app_name}}.\n\n👉 Strona aplikacji: {{app_url}}\n👉 Android: {{android_url}}\n👉 iPhone: {{ios_url}}\n\nWolisz szybką pomoc 1-na-1? Kliknij poniżej i napisz do nas na WhatsApp (odpowiadamy w 2 minuty):",
+      "quickReplies": [
+        {
+          "label": "🚀 Przejdź na WhatsApp",
+          "reply": "Otwieram bezpośredni link do czatu WhatsApp ServiceApp!",
+          "openWhatsApp": true,
+          "whatsappText": "Cześć! Jestem {{username}}, potrzebuję pomocy z pobraniem/rejestracją w ServiceApp.",
+          "leadTag": "whatsapp-support"
+        },
+        {
+          "label": "📝 Zostawię swój numer / e-mail",
+          "reply": "Jasne! Wpisz swój numer telefonu lub adres e-mail poniżej, a wyślemy Ci link instalacyjny.",
+          "captureLead": true,
+          "leadTag": "callback-install"
+        }
+      ],
+      "whatsappCtaText": "Cześć! Jestem {{username}} — proszę o link i pomoc w instalacji ServiceApp."
+    },
+    {
+      "id": "serviceapp-download-br",
+      "name": "ServiceApp Brasil (PT-BR) — Baixar App",
+      "enabled": true,
+      "channels": ["instagram", "facebook", "whatsapp", "github"],
+      "keywords": [
+        "baixar",
+        "quero",
+        "aplicativo",
+        "orcamento",
+        "trampo",
+        "servico"
+      ],
+      "matchMode": "contains",
+      "ignoreDiacritics": true,
+      "cooldownMinutes": 15,
+      "publicReplies": [
+        "Enviado no seu Direct {{username}}! 📩 Baixe o {{app_name}} grátis 🙌",
+        "Prontinho {{username}}! O link do {{app_name}} já está nas suas mensagens 🚀"
+      ],
+      "dmMessage": "Olá {{username}}! 👋 Obrigado pelo comentário!\n\nBaixe o aplicativo {{app_name}} grátis agora:\n🌐 Site: {{app_url}}\n🤖 Android: {{android_url}}\n🍎 iPhone: {{ios_url}}\n\nSe quiser ajuda rápida, clique abaixo para falar no WhatsApp:",
+      "quickReplies": [
+        {
+          "label": "🤖 Android (Google Play)",
+          "reply": "Aqui está o link para Android:\n👉 {{android_url}}",
+          "actionUrl": "{{android_url}}",
+          "actionLabel": "🤖 Abrir Google Play",
+          "leadTag": "android-br"
+        },
+        {
+          "label": "🍎 iPhone (App Store)",
+          "reply": "Aqui está o link para iPhone:\n👉 {{ios_url}}",
+          "actionUrl": "{{ios_url}}",
+          "actionLabel": "🍎 Abrir App Store",
+          "leadTag": "ios-br"
+        },
+        {
+          "label": "📲 Falar no WhatsApp",
+          "reply": "Clique abaixo para abrir nosso WhatsApp!",
+          "openWhatsApp": true,
+          "whatsappText": "Olá! Sou {{username}} e quero baixar o ServiceApp!",
+          "leadTag": "whatsapp-br"
+        }
+      ],
+      "whatsappCtaText": "Olá! Sou {{username}}, quero baixar o ServiceApp!"
+    },
+    {
+      "id": "serviceapp-download-mx",
+      "name": "ServiceApp México (ES-MX) — Descargar App",
+      "enabled": true,
+      "channels": ["instagram", "facebook", "whatsapp", "github"],
+      "keywords": [
+        "descargar",
+        "quiero",
+        "chamba",
+        "cotizacion",
+        "trabajo"
+      ],
+      "matchMode": "contains",
+      "ignoreDiacritics": true,
+      "cooldownMinutes": 15,
+      "publicReplies": [
+        "¡Enviado por mensaje privado {{username}}! 📩 Descarga {{app_name}} gratis 🙌",
+        "¡Listo {{username}}! Ya tienes los enlaces de {{app_name}} en tu DM 🚀"
+      ],
+      "dmMessage": "¡Hola {{username}}! 👋 ¡Gracias por tu comentario!\n\nDescarga {{app_name}} gratis aquí:\n🌐 Web: {{app_url}}\n🤖 Android: {{android_url}}\n🍎 iPhone: {{ios_url}}\n\n¿Necesitas ayuda? Escríbenos directo por WhatsApp:",
+      "quickReplies": [
+        {
+          "label": "🤖 Android (Google Play)",
+          "reply": "Descárgalo en Google Play:\n👉 {{android_url}}",
+          "actionUrl": "{{android_url}}",
+          "actionLabel": "🤖 Abrir Google Play",
+          "leadTag": "android-mx"
+        },
+        {
+          "label": "🍎 iPhone (App Store)",
+          "reply": "Descárgalo en App Store:\n👉 {{ios_url}}",
+          "actionUrl": "{{ios_url}}",
+          "actionLabel": "🍎 Abrir App Store",
+          "leadTag": "ios-mx"
+        },
+        {
+          "label": "📲 Ir a WhatsApp",
+          "reply": "¡Haz clic abajo para hablar por WhatsApp!",
+          "openWhatsApp": true,
+          "whatsappText": "¡Hola! Soy {{username}} y quiero descargar ServiceApp.",
+          "leadTag": "whatsapp-mx"
+        }
+      ],
+      "whatsappCtaText": "¡Hola! Soy {{username}}, quiero descargar ServiceApp."
+    }
+  ]
+}

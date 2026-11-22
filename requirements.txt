@@ -1,3 +1,0 @@
-# Bot zaprojektowany w 100% w standardowej bibliotece Pythona 3.9+ (zero zewnętrznych zależności).
-# Działa od razu w GitHub Actions oraz lokalnie bez konieczności `pip install`.
-# Uruchomienie: python3 main.py
